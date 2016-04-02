@@ -1,0 +1,11 @@
+version: "2"
+services:
+  rabbitmq:
+    image: rabbitmq:3.6.1-management
+    hostname: "rmq"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=testuser
+      - RABBITMQ_DEFAULT_PASS=testpass
