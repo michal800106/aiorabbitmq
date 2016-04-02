@@ -1,6 +1,6 @@
 # About
 
-aiorabbit is based off of aioampqp project and just adds class based functionality to rabbitmq in an asyncio fashion. All the lower level AMQP functionality is done in there. This project may work for other AMQP services but is mainly designed for rabbitmq.
+aiorabbitmqmq is based off of aioampqp project and just adds class based functionality to rabbitmq in an asyncio fashion. All the lower level AMQP functionality is done in there. This project may work for other AMQP services but is mainly designed for rabbitmq.
 
 If you have any questions or find a bug please open an issue.
 
@@ -13,7 +13,7 @@ Working this out, along with the naming
 
 ### Queue
 ```python
-from aiorabbit.queues import BaseQueue
+from aiorabbitmq.queues import BaseQueue
 
 class Queue(BaseQueue):
     QUEUE_NAME = 'my_queue'
@@ -22,7 +22,7 @@ class Queue(BaseQueue):
 
 ### Exchange
 ```python
-from aiorabbit.exchanges import BaseExchange, EXCHANGE_TYPES
+from aiorabbitmq.exchanges import BaseExchange, EXCHANGE_TYPES
 
 class Exchange(BaseExchange):
     EXCHANGE_NAME = 'my_exchange'
@@ -34,7 +34,7 @@ class Exchange(BaseExchange):
 Messages, at this point in time, must be JSON serializable.
 
 ```python
-from aiorabbit.messages import BaseMessage
+from aiorabbitmq.messages import BaseMessage
 
 class Message(BaseMessage):
     def __init__(self, value1, value2):
@@ -45,8 +45,8 @@ class Message(BaseMessage):
 ### Consumer
 ```python
 import asyncio
-from aiorabbit.connection import connection
-from aiorabbit.consumers import BaseConsumer, ProtocolMessage
+from aiorabbitmq.connection import connection
+from aiorabbitmq.consumers import BaseConsumer, ProtocolMessage
 
 class Consumer(BaseConsumer):
     EXCHANGE = Exchange  # From above
@@ -76,8 +76,8 @@ if __name__ == '__main__':
 ### Producer
 ```python
 import asyncio
-from aiorabbit.connection import connection
-from aiorabbit.producers import BaseProducer
+from aiorabbitmq.connection import connection
+from aiorabbitmq.producers import BaseProducer
 
 class Producer(BaseProducer):
     CONSUMER = Consumer # From above

@@ -1,10 +1,10 @@
 import asyncio
 
-from aiorabbit.consumers import BaseConsumer
-from aiorabbit.connection import connection
-from aiorabbit.exchanges import BaseExchange, EXCHANGE_TYPES
-from aiorabbit.queues import BaseQueue
-from aiorabbit.messages import BaseMessage
+from aiorabbitmq.consumers import BaseConsumer
+from aiorabbitmq.connection import connection
+from aiorabbitmq.exchanges import BaseExchange, EXCHANGE_TYPES
+from aiorabbitmq.queues import BaseQueue
+from aiorabbitmq.messages import BaseMessage
 
 
 class TestQueue(BaseQueue):

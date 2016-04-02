@@ -1,6 +1,6 @@
 import asyncio
 
-from aiorabbit.connection import connection
+from aiorabbitmq.connection import connection
 
 
 class EXCHANGE_TYPES:

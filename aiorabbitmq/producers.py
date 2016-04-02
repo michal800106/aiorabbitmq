@@ -1,9 +1,9 @@
 import asyncio
 
-from aiorabbit.connection import connection
-from aiorabbit.consumers import BaseConsumer
-from aiorabbit.exceptions import MismatchedMessageCls
-from aiorabbit.exchanges import BaseExchange
+from aiorabbitmq.connection import connection
+from aiorabbitmq.consumers import BaseConsumer
+from aiorabbitmq.exceptions import MismatchedMessageCls
+from aiorabbitmq.exchanges import BaseExchange
 
 
 class BaseProducer:

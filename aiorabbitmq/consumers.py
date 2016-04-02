@@ -1,10 +1,10 @@
 import asyncio
 import json
 
-from aiorabbit.connection import connection
-from aiorabbit.exceptions import MismatchedMessageCls
-from aiorabbit.queues import BaseQueue
-from aiorabbit.messages import BaseMessage, ProtocolMessage
+from aiorabbitmq.connection import connection
+from aiorabbitmq.exceptions import MismatchedMessageCls
+from aiorabbitmq.queues import BaseQueue
+from aiorabbitmq.messages import BaseMessage, ProtocolMessage
 
 
 class BaseConsumer:

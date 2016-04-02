@@ -1,7 +1,7 @@
 import asyncio
 
-from aiorabbit.connection import connection
-from aiorabbit.producers import BaseProducer
+from aiorabbitmq.connection import connection
+from aiorabbitmq.producers import BaseProducer
 from tests.consumer import TestConsumer, TestMessage
 
 
