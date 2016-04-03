@@ -1,5 +1,7 @@
 sudo: required
 
+language: python
+
 python:
   - "3.4"
   - "3.5"
@@ -13,9 +15,9 @@ env:
   - PYTHONASYNCIODEBUG=1
 
 install:
+  - pip install -e .
   - pip install -r requirements.txt
   - pip install -r requirements_dev.txt
-  - pip install -e .
 
 script: bash run_tests.sh
 
