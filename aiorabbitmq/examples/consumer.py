@@ -1,10 +1,10 @@
 import asyncio
-
+import signal
 from aiorabbitmq.consumers import BaseConsumer
 from aiorabbitmq.connection import connection
 from aiorabbitmq.exchanges import BaseExchange, EXCHANGE_TYPES
 from aiorabbitmq.queues import BaseQueue
-from aiorabbitmq.messages import BaseMessage
+from aiorabbitmq.messages import BaseMessage, ProtocolMessage
 
 
 class TestQueue(BaseQueue):
@@ -27,18 +27,21 @@ class TestConsumer(BaseConsumer):
     EXCHANGE = TestExchange
     MESSAGE_CLS = TestMessage
 
-    @asyncio.coroutine
-    def callback(self, message: TestMessage):
-        return
+    async def callback(self, message: ProtocolMessage):
+        test_message = message.body
+        print(test_message.value)
 
 
-@asyncio.coroutine
-def test_consumer():
-    with connection("192.168.99.100", 5672, "testuser", "testpass") as conn:
+async def test_consumer():
+    async with connection("localhost", 5672, "guest", "guest", vhost='/') as conn:
         consumer = TestConsumer(conn)
-        yield from consumer.run()
+        await consumer.run()
+        await stop_future
+    loop.stop()
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(test_consumer())
+    stop_future = asyncio.Future(loop=loop)
+    loop.create_task(test_consumer())
+    loop.add_signal_handler(signal.SIGHUP, lambda: stop_future.set_result(None))
     loop.run_forever()

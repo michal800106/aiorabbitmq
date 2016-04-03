@@ -2,7 +2,7 @@ import asyncio
 import json
 
 from aiorabbitmq.connection import connection
-from aiorabbitmq.exceptions import MismatchedMessageCls
+from aiorabbitmq.exceptions import MismatchedMessageCls, NotDeclared
 from aiorabbitmq.queues import BaseQueue
 from aiorabbitmq.messages import BaseMessage, ProtocolMessage
 
@@ -24,13 +24,15 @@ class BaseConsumer:
         self.connection = conn
         self.nack_on_error = nack_on_error
         if self.EXCHANGE:
-            self.exchange = self.EXCHANGE(self.connection, auto_declare=auto_declare)
+            self.exchange = self.EXCHANGE(self.connection)
         else:
             self.exchange = None
-        self.queue = self.QUEUE(self.connection, auto_declare=auto_declare)
-        self.declared = False
-        if auto_declare:
-            self.declare()
+        self.queue = self.QUEUE(self.connection)
+        self.auto_declare = auto_declare
+
+    @property
+    def declared(self):
+        return self.queue.declared and self.exchange.declared
 
     @property
     def kwargs(self):
@@ -43,43 +45,42 @@ class BaseConsumer:
             "consumer_tag": self.CONSUMER_TAG
         }
 
-    @asyncio.coroutine
-    def declare(self):
+    async def declare(self):
         try:
             if not self.queue.declared:
-                yield from self.queue.declare()
-        except Exception:
+                await self.queue.declare()
+        except Exception as e:
+            import traceback
             print("Exception during queue declaration")
-            raise
+            print(traceback.format_exc(e))
+            raise e
         if self.exchange and not self.exchange.declared:
             try:
-                yield from self.exchange.declare()
-                yield from self.exchange.bind_queue(self.QUEUE.QUEUE_NAME)
+                await self.exchange.declare()
+                await self.exchange.bind_queue(self.QUEUE.QUEUE_NAME)
             except Exception:
                 print("Exception during exchange declaration")
                 raise
-        self.declared = True
 
-    @asyncio.coroutine
-    def _callback(self, channel, body, envelope, properties):
+    async def _callback(self, channel, body, envelope, properties):
         if type(body) == bytes:
             body = body.decode(self.CHAR_SET)
         protocol_message = ProtocolMessage(channel, body, envelope, properties)
-        protocol_message.body = yield from self.clean(protocol_message)
+        protocol_message.body = await self.clean(protocol_message)
         try:
-            yield from self.callback(protocol_message)
+            await self.callback(protocol_message)
         except Exception:
             if self.nack_on_error:
                 print("Exception during callback, nacking")
-                yield from channel.basic_client_nack(envelope.delivery_tag)
+                await channel.basic_client_nack(envelope.delivery_tag)
             elif not self.NO_ACK:
-                yield from channel.basic_client_ack(envelope.delivery_tag)
+                await channel.basic_client_ack(envelope.delivery_tag)
+            raise
         else:
             if not self.NO_ACK:
-                yield from channel.basic_client_ack(envelope.delivery_tag)
+                await channel.basic_client_ack(envelope.delivery_tag)
 
-    @asyncio.coroutine
-    def clean(self, message):
+    async def clean(self, message):
         value = json.loads(message.body)
         if self.MESSAGE_CLS:
             try:
@@ -88,15 +89,16 @@ class BaseConsumer:
                 raise MismatchedMessageCls
         return value
 
-    @asyncio.coroutine
-    def callback(self, message: ProtocolMessage):
+    async def callback(self, message: ProtocolMessage):
         raise NotImplementedError
 
-    @asyncio.coroutine
-    def run(self):
-        channel = yield from self.connection.channel()
+    async def run(self):
+        channel = await self.connection.channel()
         if not self.declared:
-            yield from self.declare()
+            if self.auto_declare:
+                await self.declare()
+            else:
+                raise NotDeclared
         if self.PREFETCH_COUNT:
-            yield from channel.basic_qos(prefetch_count=self.PREFETCH_COUNT)
-        yield from channel.basic_consume(self._callback, **self.kwargs)
+            await channel.basic_qos(prefetch_count=self.PREFETCH_COUNT)
+        await channel.basic_consume(self._callback, **self.kwargs)

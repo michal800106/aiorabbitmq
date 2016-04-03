@@ -11,16 +11,13 @@ class BaseQueue:
     AUTO_DELETE = False
     NO_WAIT = False
 
-    def __init__(self, conn: connection, auto_declare=True):
+    def __init__(self, conn: connection):
         self.connection = conn
         self.declared = False
-        if auto_declare:
-            self.declare()
 
-    @asyncio.coroutine
-    def declare(self):
-        channel = yield from self.connection.channel()
-        yield from channel.queue_declare(**self.kwargs)
+    async def declare(self):
+        channel = await self.connection.channel()
+        await channel.queue_declare(**self.kwargs)
         self.declared = True
 
     @property

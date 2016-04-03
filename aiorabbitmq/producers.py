@@ -2,7 +2,7 @@ import asyncio
 
 from aiorabbitmq.connection import connection
 from aiorabbitmq.consumers import BaseConsumer
-from aiorabbitmq.exceptions import MismatchedMessageCls
+from aiorabbitmq.exceptions import MismatchedMessageCls, NotDeclared
 from aiorabbitmq.exchanges import BaseExchange
 
 
@@ -12,18 +12,24 @@ class BaseProducer:
 
     def __init__(self, conn: connection, auto_declare=True):
         self.connection = conn
+        self.auto_declare = auto_declare
         self.consumer = self.CONSUMER(self.connection, auto_declare=auto_declare)
         self.exchange = self.consumer.exchange if self.CONSUMER.EXCHANGE == self.EXCHANGE else self.EXCHANGE(conn)
-        if auto_declare:
-            self.declare()
 
-    @asyncio.coroutine
-    def declare(self):
+    @property
+    def declared(self):
+        return self.consumer.declared
+
+    async def declare(self):
         if not self.consumer.declared:
-            yield from self.consumer.declare()
+            await  self.consumer.declare()
 
-    @asyncio.coroutine
-    def publish(self, message: CONSUMER.MESSAGE_CLS, properties=None, **extras):
+    async def publish(self, message: CONSUMER.MESSAGE_CLS, properties=None, **extras):
+        if not self.declared:
+            if self.auto_declare:
+                await  self.declare()
+            else:
+                raise NotDeclared
         if not isinstance(message, self.consumer.MESSAGE_CLS):
             raise MismatchedMessageCls
         kwargs = {
@@ -38,5 +44,5 @@ class BaseProducer:
         if properties:
             kwargs['properties'] = properties
         kwargs.update(extras)
-        channel = yield from self.connection.channel()
-        yield from channel.basic_publish(**kwargs)
+        channel = await  self.connection.channel()
+        await  channel.basic_publish(**kwargs)

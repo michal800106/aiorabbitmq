@@ -1,2 +1,2 @@
 aioamqp==0.7.0
-attrdict=2.0.0
+attrdict==2.0.0

@@ -17,29 +17,30 @@ class connection:
         self.protocol = None
         self._channel = None
 
-    def __enter__(self):
+    async def __aenter__(self):
         if not self.connected:
-            self.connect()
+            await self.connect()
         return self
 
-    def __exit__(self, *err):
-        self.close()
+    async def __aexit__(self, *err):
+        if any(err):
+            import traceback
+            map(lambda x: print(traceback.format_exc(x)), err)
+        await self.close()
 
     @property
     def connected(self):
         return self.transport and self.protocol
 
-    @asyncio.coroutine
-    def channel(self):
+    async def channel(self):
         if not self.connected:
-            yield from self.connect()
+            await self.connect()
         if not self._channel:
-            self._channel = yield from self.protocol.channel()
+            self._channel = await self.protocol.channel()
         return self._channel
 
-    @asyncio.coroutine
-    def connect(self, **kwargs):
-        self.transport, self.protocol = yield from connect(
+    async def connect(self, **kwargs):
+        self.transport, self.protocol = await connect(
             host=self.host,
             port=self.port,
             login=self.login,
@@ -50,14 +51,9 @@ class connection:
             **kwargs
         )
 
-    @asyncio.coroutine
-    def close(self):
-        if not self.connected:
-            return True
-        if self.channel:
-            self._channel.close()
-        yield from self.protocol.close()
-        self.protocol = None
+    async def close(self):
+        await self.protocol.close()
         self.transport.close()
+        self.protocol = None
         self.transport = None
 

@@ -19,11 +19,9 @@ class BaseExchange:
     NO_WAIT = False
     ROUTING_KEY = ''
 
-    def __init__(self, conn: connection, auto_declare=True):
+    def __init__(self, conn: connection):
         self.connection = conn
         self.declared = False
-        if auto_declare:
-            self.declare()
 
     @property
     def exchange_kwargs(self):
@@ -36,15 +34,13 @@ class BaseExchange:
             "no_wait": self.NO_WAIT
         }
 
-    @asyncio.coroutine
-    def declare(self):
-        channel = yield from self.connection.channel()
-        yield from channel.exchange_declare(**self.exchange_kwargs)
+    async def declare(self):
+        channel = await self.connection.channel()
+        await channel.exchange_declare(**self.exchange_kwargs)
         self.declared = True
 
-    @asyncio.coroutine
-    def bind_queue(self, queue_name: str):
-        channel = yield from self.connection.channel()
-        yield from channel.queue_bind(exchange_name=self.EXCHANGE_NAME,
-                                      queue_name=queue_name,
-                                      routing_key=self.ROUTING_KEY)
+    async def bind_queue(self, queue_name: str):
+        channel = await self.connection.channel()
+        await channel.queue_bind(exchange_name=self.EXCHANGE_NAME,
+                                 queue_name=queue_name,
+                                 routing_key=self.ROUTING_KEY)

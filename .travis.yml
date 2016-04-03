@@ -1,0 +1,21 @@
+sudo: required
+
+python:
+  - "3.4"
+  - "3.5"
+  - "3.5-dev"
+  - "nightly"
+
+services:
+ - rabbitmq
+
+env:
+  - PYTHONASYNCIODEBUG=1
+
+install:
+  - pip install -r requirements.txt
+  - pip install -r requirements_dev.txt
+  - pip install -e .
+
+script: bash run_tests.sh
+
