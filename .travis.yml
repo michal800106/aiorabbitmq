@@ -14,6 +14,9 @@ services:
 env:
   - PYTHONASYNCIODEBUG=1
 
+before_script:
+  - sudo rabbitmqctl add_vhost "aiorabbit"
+
 install:
   - pip install -e .
   - pip install -r requirements.txt
