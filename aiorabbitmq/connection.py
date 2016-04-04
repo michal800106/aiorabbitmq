@@ -1,4 +1,5 @@
 import asyncio
+import uuid
 
 from aioamqp import connect
 
@@ -12,6 +13,7 @@ class connection:
         self.vhost = vhost
         self.ssl = ssl
         self.verify_ssl = verify_ssl
+        self.uuid = uuid.uuid1()
 
         self.transport = None
         self.protocol = None
@@ -40,6 +42,9 @@ class connection:
         return self._channel
 
     async def connect(self, **kwargs):
+        client_properties = kwargs.pop('client_properties', {})
+        client_properties['uuid'] = str(self.uuid)
+        kwargs['client_properties'] = client_properties
         self.transport, self.protocol = await connect(
             host=self.host,
             port=self.port,
