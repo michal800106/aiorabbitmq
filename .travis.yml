@@ -1,4 +1,8 @@
 sudo: required
+addons:
+  hosts:
+    - rabbit
+    - hare
 
 language: python
 
@@ -23,6 +27,8 @@ install:
   - sudo RABBITMQ_NODE_PORT=5673 RABBITMQ_SERVER_START_ARGS="-rabbitmq_management listener [{port,15673}]" RABBITMQ_NODENAME=hare rabbitmq-server -detached
   - sudo service rabbitmq-server restart
   - sudo rabbitmqctl add_vhost "aiorabbit"
+  - nslookup rabbit
+  - nslookup hare
 
 script: bash run_tests.sh
 
