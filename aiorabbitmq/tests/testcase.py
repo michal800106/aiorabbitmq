@@ -83,7 +83,7 @@ class RabbitTestCase(AsyncioTestCaseMixin):
 
     def setUp(self):
         super().setUp()
-        self.host = os.environ.get('AMQP_HOST', 'rabbit')
+        self.host = os.environ.get('AMQP_HOST', 'localhost')
         self.port = os.environ.get('AMQP_PORT', 5672)
         self.vhost = os.environ.get('AMQP_VHOST', self.VHOST)
         self.http_client = pyrabbit.api.Client('localhost:15672/', 'guest', 'guest')
