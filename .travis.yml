@@ -21,14 +21,8 @@ install:
   - pip install -e .
   - pip install -r requirements.txt
   - pip install -r requirements_dev.txt
-  - sudo rabbitmq-plugins enable rabbitmq_management
-  - sudo rabbitmq-plugins enable rabbitmq_federation
-  - sudo rabbitmq-plugins enable rabbitmq_federation_management
-  - sudo RABBITMQ_NODE_PORT=5673 RABBITMQ_SERVER_START_ARGS="-rabbitmq_management listener [{port,15673}]" RABBITMQ_NODENAME=hare rabbitmq-server -detached
-  - sudo service rabbitmq-server restart
-  - sudo rabbitmqctl add_vhost "aiorabbit"
-  - nslookup rabbit
-  - nslookup hare
 
-script: bash run_tests.sh
+before_script: run-tests.sh
+
+script: nosetests --verbosity=2 aiorabbitmq
 
