@@ -25,7 +25,9 @@ install:
   - pip install -r requirements.txt
   - pip install -r requirements_dev.txt
 
-before_script: docker-compose up -d rabbitmq
+before_script:
+  - docker-compose build rabbitmq
+  - docker-compose run rabbitmq
 
 script: nosetests --verbosity=2 aiorabbitmq
 
