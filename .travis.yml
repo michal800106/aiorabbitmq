@@ -7,15 +7,12 @@ python:
   - "3.5-dev"
   - "nightly"
 
-services:
- - docker
-
 env:
   - PYTHONASYNCIODEBUG=1
-  - DOCKER_COMPOSE_VERSION=1.6
 
 before_install:
   - sudo rm /usr/local/bin/docker-compose
+  - curl -sSL https://get.docker.com/ | sudo sh
   - sudo pip install docker-compose
   - docker-compose start
 
