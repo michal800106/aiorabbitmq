@@ -4,8 +4,8 @@ services:
     image: rabbitmq:3.6.1-management
     hostname: "rmq"
     ports:
-      - "15672:15672"
-      - "5672:5672"
+      - "127.0.0.1:15672:15672"
+      - "127.0.0.1:5672:5672"
     environment:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
