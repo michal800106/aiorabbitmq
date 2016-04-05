@@ -11,7 +11,6 @@ env:
   - PYTHONASYNCIODEBUG=1
 
 before_install:
-  - sudo rm /usr/local/bin/docker-compose
   - curl -sSL https://get.docker.com/ | sudo sh
   - sudo pip install docker-compose
   - docker-compose start
