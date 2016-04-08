@@ -54,6 +54,19 @@ class ConsumerTestCase(testcase.RabbitTestCase, unittest.TestCase):
         async with connection(*self.connection_args) as conn:
             consumer = self.TestConsumer(conn)
             await consumer.declare()
-            # self.http_client.get_exchange(self.TestExchange.EXCHANGE_NAME, self.VHOST)
+            exch = self.http_client.get_exchange(self.VHOST, self.TestExchange.EXCHANGE_NAME)
+            self.assertEqual(exch['name'], consumer.EXCHANGE.EXCHANGE_NAME)
+            queue = self.http_client.get_queue(self.VHOST, self.TestQueue.QUEUE_NAME)
+            self.assertEqual(queue['name'], consumer.QUEUE.QUEUE_NAME)
+
+    @testcase.coroutine
+    async def test_consume(self):
+        async with connection(*self.connection_args) as conn:
+            producer = self.TestProducer(conn)
+            consumer = self.TestConsumer(conn)
+            message = self.TestMessage(self.get_random_name())
+            consumer.current_test_value = message.value
+            await producer.publish(message)
+            await consumer.run()
 
 
