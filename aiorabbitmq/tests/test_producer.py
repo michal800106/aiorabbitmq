@@ -3,11 +3,13 @@ import unittest
 
 import time
 
+import asyncio
+
 from aiorabbitmq.connection import connection
 from aiorabbitmq.consumers import BaseConsumer
 from aiorabbitmq.exchanges import BaseExchange
 from aiorabbitmq.exchanges import EXCHANGE_TYPES
-from aiorabbitmq.messages import BaseMessage
+from aiorabbitmq.messages import BaseMessage, ProtocolMessage
 from aiorabbitmq.producers import BaseProducer
 from aiorabbitmq.queues import BaseQueue
 from aiorabbitmq.tests import testcase
@@ -33,6 +35,10 @@ class ProducerTestCase(testcase.RabbitTestCase, unittest.TestCase):
             EXCHANGE = TestExchange
             MESSAGE_CLS = TestMessage
 
+            @asyncio.coroutine
+            def callback(self, message: ProtocolMessage):
+                self.future.set_result(True)
+
         class TestProducer(BaseProducer):
             CONSUMER = TestConsumer
             EXCHANGE = TestConsumer.EXCHANGE
@@ -54,8 +60,18 @@ class ProducerTestCase(testcase.RabbitTestCase, unittest.TestCase):
             producer = self.TestProducer(conn)
             message = self.TestMessage('testing consumer')
             await producer.publish(message)
-            rmessage = self.http_client.get_messages(self.VHOST, self.TestQueue.QUEUE_NAME)
-            self.assertEqual(rmessage[0]['payload'], json.dumps(message))
+            try:
+                rmessage = self.http_client.get_messages(self.VHOST, self.TestQueue.QUEUE_NAME)
+                self.assertEqual(rmessage[0]['payload'], json.dumps(message))
+            except BrokenPipeError:
+                future = asyncio.Future()
+                consumer = self.TestConsumer(conn)
+                consumer.future = future
+                await consumer.run()
+                results = await future.result()
+                self.assertTrue(results)
+
+
 
     @testcase.coroutine
     async def test_declare(self):
