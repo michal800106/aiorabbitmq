@@ -1,4 +1,6 @@
 import os
+import random
+import string
 from functools import wraps
 import logging
 
@@ -139,6 +141,10 @@ class RabbitTestCase(AsyncioTestCaseMixin):
                 self.transport.close()
         self.loop.run_until_complete(go())
         super().tearDown()
+
+    @staticmethod
+    def get_random_name():
+        return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
 
     @property
     def amqp(self):

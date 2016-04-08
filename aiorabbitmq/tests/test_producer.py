@@ -18,14 +18,14 @@ class ProducerTestCase(testcase.RabbitTestCase, unittest.TestCase):
         super().setUp()
 
         class TestQueue(BaseQueue):
-            QUEUE_NAME = 'testqueue'
+            QUEUE_NAME = self.get_random_name()
 
         class TestMessage(BaseMessage):
             def __init__(self, value):
                 self.value = value
 
         class TestExchange(BaseExchange):
-            EXCHANGE_NAME = 'testexchange'
+            EXCHANGE_NAME = self.get_random_name()
             TYPE_NAME = EXCHANGE_TYPES.DIRECT
 
         class TestConsumer(BaseConsumer):
