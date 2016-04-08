@@ -1,5 +1,7 @@
 # About
 
+### Warning: This project is still pre-alpha. 
+
 aiorabbitmq is based off of aioampqp project and just adds class based functionality to rabbitmq in an asyncio fashion. All the lower level AMQP functionality is done in there. This project may work for other AMQP services but is mainly designed for rabbitmq.
 
 If you have any questions or find a bug please open an issue.
@@ -7,7 +9,9 @@ If you have any questions or find a bug please open an issue.
 
 # Installation
 
-Working this out, along with the naming
+```bash
+pip install aiorabbitmq
+```
 
 # Basic usage
 
