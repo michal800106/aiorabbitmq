@@ -1,9 +1,6 @@
+import asyncio
 import json
 import unittest
-
-import time
-
-import asyncio
 
 from pyrabbit.http import NetworkError
 
