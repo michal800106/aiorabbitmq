@@ -1,6 +1,8 @@
 import json
 import unittest
 
+import time
+
 from aiorabbitmq.connection import connection
 from aiorabbitmq.consumers import BaseConsumer
 from aiorabbitmq.exchanges import BaseExchange
@@ -52,6 +54,7 @@ class ProducerTestCase(testcase.RabbitTestCase, unittest.TestCase):
             producer = self.TestProducer(conn)
             message = self.TestMessage('testing consumer')
             await producer.publish(message)
+            time.sleep(1)
             rmessage = self.http_client.get_messages(self.VHOST, self.TestQueue.QUEUE_NAME)
             self.assertEqual(rmessage[0]['payload'], json.dumps(message))
 
