@@ -5,6 +5,8 @@ import time
 
 import asyncio
 
+from pyrabbit.http import NetworkError
+
 from aiorabbitmq.connection import connection
 from aiorabbitmq.consumers import BaseConsumer
 from aiorabbitmq.exchanges import BaseExchange
@@ -63,15 +65,13 @@ class ProducerTestCase(testcase.RabbitTestCase, unittest.TestCase):
             try:
                 rmessage = self.http_client.get_messages(self.VHOST, self.TestQueue.QUEUE_NAME)
                 self.assertEqual(rmessage[0]['payload'], json.dumps(message))
-            except BrokenPipeError:
+            except (BrokenPipeError, NetworkError):
                 future = asyncio.Future()
                 consumer = self.TestConsumer(conn)
                 consumer.future = future
                 await consumer.run()
                 results = await future.result()
                 self.assertTrue(results)
-
-
 
     @testcase.coroutine
     async def test_declare(self):
