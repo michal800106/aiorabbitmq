@@ -3,3 +3,10 @@ machine:
     - rabbitmq-server
   python:
     version: 3.5.0
+
+dependencies:
+  pre:
+    - pip install -r requirements_dev.txt
+    - sudo rabbitmqctl add_vhost aiorabbit
+    - sudo rabbitmqctl set_permissions -p aiorabbit guest ".*" ".*" ".*"
+    - sudo rabbitmq-plugins enable rabbitmq_management
