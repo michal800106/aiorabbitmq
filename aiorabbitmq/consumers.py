@@ -1,5 +1,6 @@
 import asyncio
 import json
+import traceback
 
 from aiorabbitmq.connection import connection
 from aiorabbitmq.exceptions import MismatchedMessageCls, NotDeclared
@@ -49,17 +50,17 @@ class BaseConsumer:
         try:
             if not self.queue.declared:
                 await self.queue.declare()
-        except Exception as e:
-            import traceback
+        except Exception:
             print("Exception during queue declaration")
-            print(traceback.format_exc(e))
-            raise e
+            print(traceback.format_exc())
+            raise
         if self.exchange and not self.exchange.declared:
             try:
                 await self.exchange.declare()
                 await self.exchange.bind_queue(self.QUEUE.QUEUE_NAME)
             except Exception:
                 print("Exception during exchange declaration")
+                print(traceback.format_exc())
                 raise
 
     async def _callback(self, channel, body, envelope, properties):
@@ -70,8 +71,9 @@ class BaseConsumer:
         try:
             await self.callback(protocol_message)
         except Exception:
+            print("Exception during callback")
+            print(traceback.format_exc())
             if self.nack_on_error:
-                print("Exception during callback, nacking")
                 await channel.basic_client_nack(envelope.delivery_tag)
             elif not self.NO_ACK:
                 await channel.basic_client_ack(envelope.delivery_tag)

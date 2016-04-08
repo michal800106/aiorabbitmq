@@ -22,12 +22,12 @@ class BaseProducer:
 
     async def declare(self):
         if not self.consumer.declared:
-            await  self.consumer.declare()
+            await self.consumer.declare()
 
     async def publish(self, message: CONSUMER.MESSAGE_CLS, properties=None, **extras):
         if not self.declared:
             if self.auto_declare:
-                await  self.declare()
+                await self.declare()
             else:
                 raise NotDeclared
         if not isinstance(message, self.consumer.MESSAGE_CLS):

@@ -1,3 +1,4 @@
+import traceback
 import uuid
 
 from aioamqp import connect
@@ -46,16 +47,21 @@ class connection:
         client_properties = kwargs.pop('client_properties', {})
         client_properties['uuid'] = str(self.uuid)
         kwargs['client_properties'] = client_properties
-        self.transport, self.protocol = await connect(
-            host=self.host,
-            port=self.port,
-            login=self.login,
-            password=self.password,
-            virtualhost=self.vhost,
-            ssl=self.ssl,
-            verify_ssl=self.verify_ssl,
-            **kwargs
-        )
+        try:
+            self.transport, self.protocol = await connect(
+                host=self.host,
+                port=self.port,
+                login=self.login,
+                password=self.password,
+                virtualhost=self.vhost,
+                ssl=self.ssl,
+                verify_ssl=self.verify_ssl,
+                **kwargs
+            )
+        except Exception:
+            print("Exception during connection setup")
+            print(traceback.format_exc())
+            raise
 
     async def close(self):
         await self.protocol.close()
