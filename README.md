@@ -1,6 +1,7 @@
 # About
 
-[![Circle CI](https://circleci.com/gh/mackeyja92/aiorabbitmq.svg?style=svg)](https://circleci.com/gh/mackeyja92/aiorabbitmq)
+[![Circle CI](https://circleci.com/gh/mackeyja92/aiorabbitmq.svg?style=svg)](https://circleci.com/gh/mackeyja92/aiorabbitmq) [![Code Issues](https://www.quantifiedcode.com/api/v1/project/36a9be4893d445ed83abe9b8a2cee9f6/badge.svg)](https://www.quantifiedcode.com/app/project/36a9be4893d445ed83abe9b8a2cee9f6)
+
 
 ### Warning: This project is still pre-alpha. 
 
