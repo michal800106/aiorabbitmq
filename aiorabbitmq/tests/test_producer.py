@@ -70,8 +70,8 @@ class ProducerTestCase(testcase.RabbitTestCase, unittest.TestCase):
                 consumer = self.TestConsumer(conn)
                 consumer.future = future
                 await consumer.run()
-                results = await future.result()
-                self.assertTrue(results)
+                await future
+                self.assertTrue(future.result())
 
     @testcase.coroutine
     async def test_declare(self):
